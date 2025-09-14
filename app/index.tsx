@@ -1,52 +1,109 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import AnimatedClock from "../components/AnimatedClock";
+import AnimatedClock2 from "../components/AnimatedClock2";
+import AnimatedClock3 from "../components/AnimatedClock3";
 
 export default function Index(): React.JSX.Element {
   return (
-    <View style={styles.container}>
-      <AnimatedClock />
+    // Use SafeAreaView as the root component to avoid UI intrusions
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView contentContainerStyle={styles.container}>
+        <Text style={styles.header}>Multiple Clocks Demo</Text>
 
-      <View style={styles.card}>
-        <Text style={styles.title}>Animated Clock Demo</Text>
-        <Text style={styles.subtitle}>
-          Minute hand: 1 rotation per 6 seconds
-        </Text>
-        <Text style={styles.subtitleLast}>
-          Hour hand: 1 rotation per 72 seconds
-        </Text>
-      </View>
-    </View>
+        <View style={styles.clockRow}>
+          <View style={styles.clockContainer}>
+            <AnimatedClock speed={0.5} size={50} />
+            <Text style={styles.label}>Half Speed</Text>
+            <Text style={styles.sublabel}>0.5x</Text>
+          </View>
+
+          <View style={styles.clockContainer}>
+            <AnimatedClock speed={0.5} size={50} />
+            <Text style={styles.label}>Half Speed</Text>
+            <Text style={styles.sublabel}>0.5x</Text>
+          </View>
+
+          <View style={styles.clockContainer}>
+            <AnimatedClock2 speed={1} size={50} />
+            <Text style={styles.label}>Normal Speed</Text>
+            <Text style={styles.sublabel}>1x</Text>
+          </View>
+
+          <View style={styles.clockContainer}>
+            <AnimatedClock2 speed={1} size={50} />
+            <Text style={styles.label}>Normal Speed</Text>
+            <Text style={styles.sublabel}>1x</Text>
+          </View>
+        </View>
+
+        <View style={styles.clockContainer}>
+          <AnimatedClock2 speed={2} size={50} />
+          <Text style={styles.label}>Double Speed</Text>
+          <Text style={styles.sublabel}>2x</Text>
+        </View>
+
+        <View style={styles.clockContainer}>
+          <AnimatedClock speed={3} size={50} />
+          <Text style={styles.label}>Triple Speed</Text>
+          <Text style={styles.sublabel}>3x</Text>
+        </View>
+
+        <View style={styles.clockRow}>
+          <View style={styles.clockContainer}>
+            <AnimatedClock2 speed={2} size={50} />
+            <Text style={styles.label}>Double Speed</Text>
+            <Text style={styles.sublabel}>2x</Text>
+          </View>
+
+          <View style={styles.clockContainer}>
+            <AnimatedClock3 speed={3} size={50} />
+            <Text style={styles.label}>Triple Speed</Text>
+            <Text style={styles.sublabel}>3x</Text>
+          </View>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  // Style for the SafeAreaView component
+  safeArea: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
     backgroundColor: "#f0f0f0",
   },
-  card: {
-    marginTop: 30,
-    padding: 20,
-    borderRadius: 12,
-    borderWidth: 3,
-    borderColor: "#000",
+  // Style for the ScrollView's content container
+  container: {
+    flexGrow: 1,
+    paddingVertical: 50,
+    paddingHorizontal: 20,
+  },
+  header: {
+    fontSize: 24,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 30,
+    color: "#333",
+  },
+  clockRow: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginBottom: 30,
+  },
+  clockContainer: {
     alignItems: "center",
   },
-  title: {
-    fontSize: 16,
+  label: {
+    marginTop: 10,
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#333",
+  },
+  sublabel: {
+    fontSize: 12,
     color: "#666",
-    marginBottom: 10,
-  },
-  subtitle: {
-    marginTop: 5,
-    fontSize: 12,
-    color: "#999",
-  },
-  subtitleLast: {
-    fontSize: 12,
-    color: "#999",
+    marginTop: 2,
   },
 });
