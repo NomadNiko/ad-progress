@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "ad-progress",
+    "name": "AdProgress",
     "slug": "ad-progress",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -47,7 +47,15 @@
             "backgroundColor": "#000000"
           }
         }
-      ]
+      ],
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-8406679264944836~3201500839",
+          "iosAppId": "ca-app-pub-8406679264944836~3201500839"
+        }
+      ],
+      "expo-maps"
     ],
     "experiments": {
       "typedRoutes": true,

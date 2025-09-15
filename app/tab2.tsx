@@ -5,11 +5,11 @@ import { router } from "expo-router";
 import React, { useState } from "react";
 import { StyleSheet, Text } from "react-native";
 
-export default function Index(): React.JSX.Element {
+export default function Tab2(): React.JSX.Element {
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
   const [selectedMoneyIndex, setSelectedMoneyIndex] = useState<number>(0);
   const pickerOptions = ["User", "Admin", "Vendor"];
-  const image = require("../assets/images/bg_dark.jpg");
+  const image = require("../assets/images/bg_light.jpg");
 
   return (
     // Use SafeAreaView as the root component to avoid UI intrusions
@@ -30,10 +30,10 @@ export default function Index(): React.JSX.Element {
                 systemImage="person.crop.circle.badge.xmark"
                 onPress={() => {
                   console.log("Navigated to Settings via Dropdown");
-                  router.push("/tab2");
+                  router.push("/");
                 }}
               >
-                Push to Tab2
+                Push to Tab1
               </Button>
               <Picker
                 label="Account Type"
