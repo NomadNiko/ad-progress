@@ -1,4 +1,11 @@
-import { Button, ContextMenu, Host, Picker } from "@expo/ui/swift-ui";
+import {
+  Button,
+  ColorPicker,
+  ContextMenu,
+  Host,
+  Picker,
+  Slider,
+} from "@expo/ui/swift-ui";
 import { GlassView } from "expo-glass-effect";
 import { ImageBackground } from "expo-image";
 import { router } from "expo-router";
@@ -7,17 +14,56 @@ import { StyleSheet, Text } from "react-native";
 
 export default function Index(): React.JSX.Element {
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
-  const [selectedMoneyIndex, setSelectedMoneyIndex] = useState<number>(0);
+  const [regularOpacityIndex, setRegularOpacityIndex] = useState<number>(2);
+  const [regularColor, setRegularColor] = useState<string>("#ff0000ff");
+  const [clearOpacityValue, setClearOpacityValue] = useState<number>(0.25);
+  const [clearColor, setClearColor] = useState<string>("#0051ffff");
   const pickerOptions = ["User", "Admin", "Vendor"];
-  const image = require("../assets/images/bg_dark.jpg");
+  const image = require("../assets/images/bg_medium.jpg");
+
+  // Opacity options and their corresponding hex values for the Picker
+  const opacityOptions = ["0%", "25%", "50%", "75%", "100%"];
+  const opacityValues = ["00", "40", "80", "BF", "FF"];
+
+  // Function to get the background color with selected opacity (for Picker)
+  const getBackgroundColor = (color: string, index: number) => {
+    let baseColor = color;
+    if (color.length === 9) {
+      baseColor = color.substring(0, 7);
+    } else if (color.length === 4) {
+      baseColor = `#${color[1]}${color[1]}${color[2]}${color[2]}${color[3]}${color[3]}`;
+    }
+    return `${baseColor}${opacityValues[index]}`;
+  };
+
+  // Function to get background color with slider value
+  const getSliderBackgroundColor = (color: string, value: number) => {
+    let baseColor = color;
+    if (color.length === 9) {
+      baseColor = color.substring(0, 7);
+    } else if (color.length === 4) {
+      baseColor = `#${color[1]}${color[1]}${color[2]}${color[2]}${color[3]}${color[3]}`;
+    }
+    const hexOpacity = Math.round(value * 255)
+      .toString(16)
+      .padStart(2, "0")
+      .toUpperCase();
+    return `${baseColor}${hexOpacity}`;
+  };
 
   return (
-    // Use SafeAreaView as the root component to avoid UI intrusions
-
     <ImageBackground source={image} style={styles.backgroundImage}>
-      {/* Basic Glass View */}
+      {/* Regular Glass View with Picker for opacity */}
       <GlassView
-        style={styles.regularGlassView}
+        style={[
+          styles.regularGlassView,
+          {
+            backgroundColor: getBackgroundColor(
+              regularColor,
+              regularOpacityIndex
+            ),
+          },
+        ]}
         glassEffectStyle="regular"
         isInteractive
       >
@@ -51,18 +97,67 @@ export default function Index(): React.JSX.Element {
             </ContextMenu.Trigger>
           </ContextMenu>
         </Host>
-      </GlassView>
-      {/* Glass View with clear style */}
-      <GlassView style={styles.clearGlassView} glassEffectStyle="clear">
-        <Text style={styles.header}>Clear Glass Effect</Text>
-        <Host style={{ width: 280, height: 60 }} matchContents>
+
+        <Host style={{ width: 300, height: 60, marginTop: 10 }}>
           <Picker
-            options={["$", "$$", "$$$", "$$$$"]}
-            selectedIndex={selectedMoneyIndex}
+            options={opacityOptions}
+            selectedIndex={regularOpacityIndex}
             onOptionSelected={({ nativeEvent: { index } }) => {
-              setSelectedMoneyIndex(index);
+              setRegularOpacityIndex(index);
+              console.log(`Regular opacity set to: ${opacityOptions[index]}`);
             }}
             variant="segmented"
+          />
+        </Host>
+
+        <Host style={styles.colorPickerRegular} matchContents>
+          <ColorPicker
+            label="Background Color"
+            selection={regularColor}
+            onValueChanged={(color) => {
+              setRegularColor(color);
+              console.log(`Regular color changed to: ${color}`);
+            }}
+          />
+        </Host>
+      </GlassView>
+
+      {/* Clear Glass View with Slider for opacity */}
+      <GlassView
+        style={[
+          styles.clearGlassView,
+          {
+            backgroundColor: getSliderBackgroundColor(
+              clearColor,
+              clearOpacityValue
+            ),
+          },
+        ]}
+        glassEffectStyle="clear"
+        isInteractive
+      >
+        <Text style={styles.header}>Clear Glass Effect</Text>
+
+        <Host style={{ width: 280, minHeight: 60 }}>
+          <Slider
+            value={clearOpacityValue}
+            onValueChange={(value) => {
+              setClearOpacityValue(value);
+            }}
+          />
+        </Host>
+        <Text style={styles.sliderLabel}>
+          Opacity: {Math.round(clearOpacityValue * 100)}%
+        </Text>
+
+        <Host style={styles.colorPicker} matchContents>
+          <ColorPicker
+            label="Background Color"
+            selection={clearColor}
+            onValueChanged={(color) => {
+              setClearColor(color);
+              console.log(`Clear color changed to: ${color}`);
+            }}
           />
         </Host>
       </GlassView>
@@ -81,50 +176,49 @@ const styles = StyleSheet.create({
   },
   regularGlassView: {
     position: "absolute",
-    top: 100,
-    width: 340,
-    height: 200,
+    top: 80,
+    width: 350,
+    height: 310,
     borderRadius: 24,
     justifyContent: "center",
     alignItems: "center",
     padding: 20,
-    backgroundColor: "#15ff0063",
   },
   clearGlassView: {
     position: "absolute",
-    top: 350,
+    top: 420,
     width: 350,
-    height: 160,
+    height: 225,
     borderRadius: 24,
     justifyContent: "center",
     alignItems: "center",
     padding: 20,
-    backgroundColor: "#004dc098",
   },
   header: {
     fontSize: 30,
     fontWeight: "bold",
     textAlign: "center",
-    marginBottom: 30,
+    marginBottom: 20,
     color: "#ffffffff",
   },
-  clockRow: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    marginBottom: 30,
-  },
-  clockContainer: {
-    alignItems: "center",
-  },
-  label: {
-    marginTop: 10,
+  opacityLabel: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#333",
+    textAlign: "center",
+    marginBottom: 10,
+    color: "#ffffffDD",
   },
-  sublabel: {
-    fontSize: 12,
-    color: "#666",
-    marginTop: 2,
+  sliderLabel: {
+    fontSize: 14,
+    fontWeight: "500",
+    textAlign: "center",
+    marginBottom: 5,
+    color: "#ffffffBB",
+  },
+  colorPicker: {
+    marginTop: 12,
+  },
+  colorPickerRegular: {
+    marginTop: 12,
   },
 });
