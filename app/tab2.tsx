@@ -1,235 +1,182 @@
-import {
-  Button,
-  ColorPicker,
-  ContextMenu,
-  Host,
-  Picker,
-  Slider,
-} from "@expo/ui/swift-ui";
-import { GlassView } from "expo-glass-effect";
-import { ImageBackground } from "expo-image";
-import { router } from "expo-router";
+import * as Haptics from "expo-haptics";
+import { Image } from "expo-image";
 import React, { useState } from "react";
-import { StyleSheet, Text } from "react-native";
+import { ImageSourcePropType, StyleSheet, Text, View } from "react-native";
+
+type ButtonName = "x" | "circle" | "triangle" | "square";
+
+const buttonImages: Record<
+  ButtonName,
+  { normal: ImageSourcePropType; pressed: ImageSourcePropType }
+> = {
+  x: {
+    normal: require("../assets/buttons/yellow-hex-x.png"),
+    pressed: require("../assets/buttons/yellow-hex-x-pressed.png"),
+  },
+  circle: {
+    normal: require("../assets/buttons/yellow-hex-circle.png"),
+    pressed: require("../assets/buttons/yellow-hex-circle-pressed.png"),
+  },
+  triangle: {
+    normal: require("../assets/buttons/yellow-hex-triangle.png"),
+    pressed: require("../assets/buttons/yellow-hex-triangle-pressed.png"),
+  },
+  square: {
+    normal: require("../assets/buttons/yellow-hex-square.png"),
+    pressed: require("../assets/buttons/yellow-hex-square-pressed.png"),
+  },
+};
 
 export default function Tab2(): React.JSX.Element {
-  const [selectedIndex, setSelectedIndex] = useState<number>(0);
-  const [selectedOpacityIndex, setSelectedOpacityIndex] = useState<number>(2);
-  const [selectedColor, setSelectedColor] = useState<string>("#004dc0");
-  const [regularOpacityValue, setRegularOpacityValue] = useState<number>(0.5);
-  const [regularColor, setRegularColor] = useState<string>("#15ff00");
-  const pickerOptions = ["User", "Admin", "Vendor"];
-  const image = require("../assets/images/bg_light.jpg");
+  const [pressedButtons, setPressedButtons] = useState<Set<ButtonName>>(
+    new Set()
+  );
 
-  // Opacity options and their corresponding hex values for the Clear view
-  const opacityOptions = ["0%", "25%", "50%", "75%", "100%"];
-  const opacityValues = ["00", "40", "80", "BF", "FF"];
-
-  // Function to get the background color with selected opacity (for Clear view)
-  const getBackgroundColor = (color: string, index: number) => {
-    let baseColor = color;
-    if (color.length === 9) {
-      baseColor = color.substring(0, 7);
-    } else if (color.length === 4) {
-      baseColor = `#${color[1]}${color[1]}${color[2]}${color[2]}${color[3]}${color[3]}`;
-    }
-    return `${baseColor}${opacityValues[index]}`;
+  const handlePressIn = (button: ButtonName) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    setPressedButtons((prev) => new Set(prev).add(button));
   };
 
-  // Function to get background color with slider value for Regular view
-  const getSliderBackgroundColor = (color: string, value: number) => {
-    let baseColor = color;
-    if (color.length === 9) {
-      baseColor = color.substring(0, 7);
-    } else if (color.length === 4) {
-      baseColor = `#${color[1]}${color[1]}${color[2]}${color[2]}${color[3]}${color[3]}`;
-    }
-    const hexOpacity = Math.round(value * 255)
-      .toString(16)
-      .padStart(2, "0")
-      .toUpperCase();
-    return `${baseColor}${hexOpacity}`;
+  const handlePressOut = (button: ButtonName) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Rigid);
+    setPressedButtons((prev) => {
+      const newSet = new Set(prev);
+      newSet.delete(button);
+      return newSet;
+    });
+  };
+
+  const getStatusText = () => {
+    if (pressedButtons.size === 0) return "No buttons pressed";
+    const pressed = Array.from(pressedButtons)
+      .map((b) => b.toUpperCase())
+      .join(", ");
+    return `You pressed ${pressed}!`;
+  };
+
+  const getButtonImage = (button: ButtonName, isPressed: boolean) => {
+    return buttonImages[button][isPressed ? "pressed" : "normal"];
   };
 
   return (
-    <ImageBackground source={image} style={styles.backgroundImage}>
-      {/* Regular Glass View with Slider for opacity */}
-      <GlassView
-        style={[
-          styles.regularGlassView,
-          {
-            backgroundColor: getSliderBackgroundColor(
-              regularColor,
-              regularOpacityValue
-            ),
-          },
-        ]}
-        glassEffectStyle="regular"
-        isInteractive
-      >
-        <Text style={styles.header}>Regular Glass Effect</Text>
+    <View style={styles.container}>
+      <Text style={styles.statusText}>{getStatusText()}</Text>
 
-        <Host style={{ width: 150, height: 50 }}>
-          <ContextMenu>
-            <ContextMenu.Items>
-              <Button
-                systemImage="person.crop.circle.badge.xmark"
-                onPress={() => {
-                  console.log("Navigated to Settings via Dropdown");
-                  router.push("/tab2");
-                }}
-              >
-                Push to Tab2
-              </Button>
-              <Picker
-                label="Account Type"
-                options={pickerOptions}
-                variant="menu"
-                selectedIndex={selectedIndex}
-                onOptionSelected={({ nativeEvent: { index } }) => {
-                  console.log(`Selected option: ${pickerOptions[index]}`);
-                  setSelectedIndex(index);
-                }}
-              />
-            </ContextMenu.Items>
-            <ContextMenu.Trigger>
-              <Button variant="glass">Guest Accounts</Button>
-            </ContextMenu.Trigger>
-          </ContextMenu>
-        </Host>
+      <View style={styles.controllerArea}>
+        <View style={styles.diamondContainer}>
+          {/* X Button - Top */}
+          <View
+            onTouchStart={() => handlePressIn("x")}
+            onTouchEnd={() => handlePressOut("x")}
+            style={[styles.button, styles.topButton]}
+          >
+            <Image
+              source={getButtonImage("x", pressedButtons.has("x"))}
+              style={styles.buttonImage}
+              contentFit="contain"
+            />
+          </View>
 
-        <Text style={styles.controlLabel}>Background Controls</Text>
-        <Text style={styles.sliderLabel}>
-          Opacity: {Math.round(regularOpacityValue * 100)}%
-        </Text>
+          {/* Circle Button - Right */}
+          <View
+            onTouchStart={() => handlePressIn("circle")}
+            onTouchEnd={() => handlePressOut("circle")}
+            style={[styles.button, styles.rightButton]}
+          >
+            <Image
+              source={getButtonImage("circle", pressedButtons.has("circle"))}
+              style={styles.buttonImage}
+              contentFit="contain"
+            />
+          </View>
 
-        <Host style={{ width: 280, minHeight: 60 }}>
-          <Slider
-            value={regularOpacityValue}
-            onValueChange={(value) => {
-              setRegularOpacityValue(value);
-            }}
-          />
-        </Host>
+          {/* Triangle Button - Bottom */}
+          <View
+            onTouchStart={() => handlePressIn("triangle")}
+            onTouchEnd={() => handlePressOut("triangle")}
+            style={[styles.button, styles.bottomButton]}
+          >
+            <Image
+              source={getButtonImage(
+                "triangle",
+                pressedButtons.has("triangle")
+              )}
+              style={styles.buttonImage}
+              contentFit="contain"
+            />
+          </View>
 
-        <Host style={styles.colorPickerRegular} matchContents>
-          <ColorPicker
-            label="Background Color"
-            selection={regularColor}
-            onValueChanged={(color) => {
-              setRegularColor(color);
-              console.log(`Regular color changed to: ${color}`);
-            }}
-          />
-        </Host>
-      </GlassView>
-
-      {/* Clear Glass View with Picker for opacity */}
-      <GlassView
-        style={[
-          styles.clearGlassView,
-          {
-            backgroundColor: getBackgroundColor(
-              selectedColor,
-              selectedOpacityIndex
-            ),
-          },
-        ]}
-        glassEffectStyle="clear"
-      >
-        <Text style={styles.header}>Clear Glass Effect</Text>
-        <Text style={styles.opacityLabel}>Background Controls</Text>
-
-        <Host style={{ width: 280, height: 60 }} matchContents>
-          <Picker
-            options={opacityOptions}
-            selectedIndex={selectedOpacityIndex}
-            onOptionSelected={({ nativeEvent: { index } }) => {
-              setSelectedOpacityIndex(index);
-              console.log(`Opacity set to: ${opacityOptions[index]}`);
-            }}
-            variant="segmented"
-          />
-        </Host>
-
-        <Host style={styles.colorPicker} matchContents>
-          <ColorPicker
-            label="Background Color"
-            selection={selectedColor}
-            onValueChanged={(color) => {
-              setSelectedColor(color);
-              console.log(`Color changed to: ${color}`);
-            }}
-          />
-        </Host>
-      </GlassView>
-    </ImageBackground>
+          {/* Square Button - Left */}
+          <View
+            onTouchStart={() => handlePressIn("square")}
+            onTouchEnd={() => handlePressOut("square")}
+            style={[styles.button, styles.leftButton]}
+          >
+            <Image
+              source={getButtonImage("square", pressedButtons.has("square"))}
+              style={styles.buttonImage}
+              contentFit="contain"
+            />
+          </View>
+        </View>
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#1a1a1a",
   },
-  backgroundImage: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  regularGlassView: {
-    position: "absolute",
-    top: 80,
-    width: 350,
-    height: 310,
-    borderRadius: 24,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-  },
-  clearGlassView: {
-    position: "absolute",
-    top: 420,
-    width: 350,
-    height: 225,
-    borderRadius: 24,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-  },
-  header: {
-    fontSize: 30,
+  statusText: {
+    fontSize: 24,
     fontWeight: "bold",
+    color: "#ffffff",
     textAlign: "center",
-    marginBottom: 20,
-    color: "#ffffffff",
+    marginTop: 60,
   },
-  opacityLabel: {
-    fontSize: 14,
-    fontWeight: "600",
-    textAlign: "center",
-    marginBottom: 10,
-    color: "#ffffffDD",
+  controllerArea: {
+    position: "absolute",
+    bottom: 100,
+    left: 0,
+    right: 0,
+    height: "33%",
+    justifyContent: "center",
+    alignItems: "center",
   },
-  controlLabel: {
-    fontSize: 14,
-    fontWeight: "600",
-    textAlign: "center",
-    marginTop: 15,
-    marginBottom: 5,
-    color: "#ffffffDD",
+  diamondContainer: {
+    width: 200,
+    height: 200,
+    position: "relative",
   },
-  sliderLabel: {
-    fontSize: 12,
-    fontWeight: "500",
-    textAlign: "center",
-    marginTop: 5,
-    marginBottom: 5,
-    color: "#ffffffBB",
+  button: {
+    position: "absolute",
+    width: 80,
+    height: 80,
   },
-  colorPicker: {
-    marginTop: 15,
+  buttonImage: {
+    width: "100%",
+    height: "100%",
   },
-  colorPickerRegular: {
-    marginTop: 10,
+  topButton: {
+    top: 0,
+    left: "50%",
+    transform: [{ translateX: -40 }],
+  },
+  rightButton: {
+    top: "50%",
+    right: 0,
+    transform: [{ translateY: -40 }],
+  },
+  bottomButton: {
+    bottom: 0,
+    left: "50%",
+    transform: [{ translateX: -40 }],
+  },
+  leftButton: {
+    top: "50%",
+    left: 0,
+    transform: [{ translateY: -40 }],
   },
 });
