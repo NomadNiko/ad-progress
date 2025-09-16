@@ -1,72 +1,50 @@
+import { Host, Switch } from "@expo/ui/swift-ui";
 import { GlassContainer, GlassView } from "expo-glass-effect";
 import { ImageBackground } from "expo-image";
-import { StyleSheet, View } from "react-native";
+import React, { useState } from "react";
+import { StyleSheet, Text, View } from "react-native";
 
 export default function Tab3() {
-  const image = require("../assets/images/bg_light.jpg");
+  const image = require("../assets/images/bg_water.jpg");
+  const [likesDogs, setLikesDogs] = useState<boolean>(true);
+  const [likesCats, setLikesCats] = useState<boolean>(true);
 
   return (
-    <View style={styles.container}>
+    <View style={styles.pageContainer}>
       <ImageBackground source={image} style={styles.backgroundImage}>
-        <View style={styles.mainContainer}>
-          {/* Row 1: Clear glass shapes */}
+        <View style={styles.columnContainer}>
           <GlassContainer spacing={10} style={styles.rowContainer}>
             <GlassView
-              style={styles.glass1}
+              style={styles.glassView}
               glassEffectStyle="clear"
               isInteractive
-            />
-            <GlassView style={styles.glass2} glassEffectStyle="clear" />
-            <GlassView
-              style={styles.glass3}
-              glassEffectStyle="clear"
-              isInteractive
-            />
-          </GlassContainer>
-
-          {/* Row 2: Regular glass shapes */}
-          <GlassContainer spacing={10} style={styles.rowContainer}>
-            <GlassView
-              style={styles.glass1}
-              glassEffectStyle="regular"
-              isInteractive
-            />
-            <GlassView style={styles.glass2} glassEffectStyle="regular" />
-            <GlassView
-              style={styles.glass3}
-              glassEffectStyle="regular"
-              isInteractive
-            />
-          </GlassContainer>
-
-          {/* Row 3: Mixed glass shapes */}
-          <GlassContainer spacing={10} style={styles.rowContainer}>
-            <GlassView
-              style={styles.glass1}
-              glassEffectStyle="clear"
-              isInteractive
-            />
-            <GlassView style={styles.glass2} glassEffectStyle="regular" />
-            <GlassView
-              style={styles.glass3}
-              glassEffectStyle="clear"
-              isInteractive
-            />
-          </GlassContainer>
-
-          {/* Row 4: Mixed glass shapes */}
-          <GlassContainer spacing={10} style={styles.rowContainer}>
-            <GlassView
-              style={styles.glass1}
-              glassEffectStyle="regular"
-              isInteractive
-            />
-            <GlassView style={styles.glass2} glassEffectStyle="clear" />
-            <GlassView
-              style={styles.glass3}
-              glassEffectStyle="regular"
-              isInteractive
-            />
+            >
+              <Text style={styles.header}>Toggles</Text>
+              <Host style={{ width: 150, height: 50 }} matchContents>
+                <Switch
+                  value={likesDogs}
+                  onValueChange={(value) => {
+                    setLikesDogs(value);
+                  }}
+                  label="I like Dogs"
+                  variant="switch"
+                />
+              </Host>
+              <Host
+                style={{ width: 150, height: 50, margin: 10 }}
+                matchContents
+              >
+                <Switch
+                  value={likesCats}
+                  onValueChange={(value) => {
+                    setLikesCats(value);
+                  }}
+                  label="I love Cats"
+                  variant="switch"
+                  color="blue"
+                />
+              </Host>
+            </GlassView>
           </GlassContainer>
         </View>
       </ImageBackground>
@@ -75,7 +53,7 @@ export default function Tab3() {
 }
 
 const styles = StyleSheet.create({
-  container: {
+  pageContainer: {
     flex: 1,
   },
   backgroundImage: {
@@ -83,7 +61,14 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
-  mainContainer: {
+  header: {
+    fontSize: 30,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 20,
+    color: "#ffffffff",
+  },
+  columnContainer: {
     position: "absolute",
     width: "100%",
     height: "100%",
@@ -97,24 +82,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  glass1: {
-    marginRight: 20,
-    width: 120,
-    height: 120,
+  glassView: {
+    marginTop: 20,
+    width: 300,
+    height: 200,
     borderRadius: 60,
     backgroundColor: "#ff000036",
-  },
-  glass2: {
-    position: "absolute",
-    width: 90,
-    height: 30,
-    borderRadius: 25,
-  },
-  glass3: {
-    marginLeft: 20,
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: "#0011ff36",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

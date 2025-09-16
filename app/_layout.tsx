@@ -24,6 +24,7 @@ export default function TabLayout() {
             default: "suit.diamond",
             selected: "suit.diamond.fill",
           }}
+          //src={require("../assets/buttons/red-hex-circle.png")}
         />
         <Label hidden>Tab2</Label>
       </NativeTabs.Trigger>
