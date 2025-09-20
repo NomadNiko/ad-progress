@@ -1,1 +1,0 @@
-export { ElfCharacter } from './ElfCharacter';
