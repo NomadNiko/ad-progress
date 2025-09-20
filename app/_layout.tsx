@@ -51,7 +51,20 @@ export default function TabLayout() {
             selected: "suit.spade.fill",
           }}
         />
-        <Label hidden>Tab3</Label>
+        <Label hidden>Tab4</Label>
+      </NativeTabs.Trigger>
+
+      {/* Tab 5 - Carousel */}
+      <NativeTabs.Trigger name="carousel">
+        <NativeTabs.Trigger.TabBar backgroundColor="blue" />
+        <Icon
+          selectedColor="#ff6b35ff"
+          sf={{
+            default: "photo.stack",
+            selected: "photo.stack.fill",
+          }}
+        />
+        <Label hidden>Carousel</Label>
       </NativeTabs.Trigger>
       {/* End */}
     </NativeTabs>
